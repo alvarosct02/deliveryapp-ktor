@@ -1,1 +1,1 @@
-rootProject.name = "com.kamiz.deliveryapp"
+rootProject.name = "deliveryapp"
