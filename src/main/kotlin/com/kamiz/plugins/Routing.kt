@@ -1,5 +1,6 @@
 package com.kamiz.plugins
 
+import com.kamiz.database.DatabaseFactory
 import io.ktor.server.routing.*
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -10,7 +11,8 @@ fun Application.configureRouting() {
 
     routing {
         get("/") {
-            call.respondText("Hello World!")
+            val users = DatabaseFactory.userDao.all()
+            call.respondText("Users: ${users.size}")
         }
 
     }
