@@ -13,4 +13,8 @@ class ProductDataSource() {
     suspend fun getProductsByCategory(id: Int): List<Product> = dbQuery {
         CategoryEntity.findById(id)?.products?.map { it.toModel() }.orEmpty()
     }
+
+    suspend fun getProductsByName(name: String): List<Product> = dbQuery {
+        ProductEntity.all().map { it.toModel() }.filter { it.name.contains(name, ignoreCase = true) }
+    }
 }

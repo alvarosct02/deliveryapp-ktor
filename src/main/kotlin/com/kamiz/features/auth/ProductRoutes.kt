@@ -25,4 +25,19 @@ fun Route.getProducts(
             message = productDataSource.getAllProducts()
         )
     }
+    get("search") {
+        val name = call.parameters["name"]
+        if (!name.isNullOrEmpty()) {
+            call.respond(
+                status = HttpStatusCode.OK,
+                message = productDataSource.getProductsByName(name)
+            )
+            return@get
+        }
+
+        call.respond(
+            status = HttpStatusCode.OK,
+            message = productDataSource.getAllProducts()
+        )
+    }
 }
