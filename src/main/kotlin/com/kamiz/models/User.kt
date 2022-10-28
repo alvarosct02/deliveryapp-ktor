@@ -19,9 +19,9 @@ object UserTable : Table() {
     val email = varchar("email", 128)
     val passwordHash = varchar("passwordHash", 128)
 
-     override val primaryKey = PrimaryKey(id)
+    override val primaryKey = PrimaryKey(id)
 
-     fun resultRowToItem(row: ResultRow) = User(
+    fun resultRowToItem(row: ResultRow) = User(
         id = row[id],
         firstName = row[firstName],
         lastName = row[lastName],
@@ -29,7 +29,7 @@ object UserTable : Table() {
         passwordHash = row[passwordHash]
     )
 
-     fun itemToResultRow(item: User) = insert {
+    fun itemToResultRow(item: User) = insert {
         it[firstName] = item.firstName
         it[lastName] = item.lastName
         it[email] = item.email

@@ -7,4 +7,7 @@ class UserDataSource() {
     suspend fun getUserByUsername(username: String): User? {
         return DatabaseFactory.userDao.findByEmail(username)
     }
+    suspend fun createUser(user: User): User? {
+        return DatabaseFactory.userDao.add(user)
+    }
 }

@@ -1,8 +1,8 @@
 package com.kamiz.features.auth
 
 import com.kamiz.data.UserDataSource
-import com.kamiz.requests.LoginRequest
-import com.kamiz.requests.LoginResponse
+import com.kamiz.models.User
+import com.kamiz.requests.*
 import com.kamiz.security.hashing.HashingService
 import com.kamiz.security.token.TokenClaim
 import com.kamiz.security.token.TokenConfig
@@ -20,26 +20,26 @@ fun Route.signIn(
     tokenService: TokenService,
     tokenConfig: TokenConfig
 ) {
-    post("signin") {
-        val request = call.receiveOrNull<LoginRequest>() ?: kotlin.run {
+    post("login") {
+        val request = call.receiveNullable<LoginRequest>() ?: run {
             call.respond(HttpStatusCode.BadRequest)
             return@post
         }
 
-        val user = userDataSource.getUserByUsername(request.email.orEmpty())
+        val user = userDataSource.getUserByUsername(request.email)
         if (user == null) {
-            call.respond(HttpStatusCode.Conflict, "Incorrect username or password")
+            call.respond(HttpStatusCode.Conflict, ApiError("Incorrect username or password"))
             return@post
         }
 
-        val password = request.password.orEmpty()
+        val password = request.password
         val isValidPassword = hashingService.verify(
             value = password,
             user.passwordHash
         )
         if (!isValidPassword) {
             println("Entered hash: ${hashingService.generateHash(password)}, Hashed PW: ${user.passwordHash}")
-            call.respond(HttpStatusCode.Conflict, "Incorrect username or password")
+            call.respond(HttpStatusCode.Conflict, ApiError("Incorrect username or password"))
             return@post
         }
 
@@ -57,5 +57,38 @@ fun Route.signIn(
                 token = token
             )
         )
+    }
+
+    post("sign_up") {
+        val request = call.receiveNullable<SignUpRequest>() ?: run {
+            call.respond(HttpStatusCode.BadRequest)
+            return@post
+        }
+
+        val user = userDataSource.getUserByUsername(request.email)
+        if (user != null) {
+            call.respond(HttpStatusCode.Conflict, ApiError("Email is already in use"))
+            return@post
+        }
+
+        val passwordHash = hashingService.generateHash(request.password)
+
+        val newUser = userDataSource.createUser(
+            User(
+                firstName = request.firstName,
+                lastName = request.lastName,
+                email = request.email,
+                passwordHash = passwordHash,
+            )
+        )
+
+        if (newUser == null) {
+            call.respond(HttpStatusCode.Conflict, ApiError("Cannot create new user"))
+        } else {
+            call.respond(
+                status = HttpStatusCode.OK,
+                message = UserResponse.fromUser(newUser)
+            )
+        }
     }
 }
