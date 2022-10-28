@@ -23,6 +23,7 @@ class CategoryEntity(id: EntityID<Int>) : Entity<Int>(id) {
 
     var name by CategoryTable.name
     var photoUrl by CategoryTable.photoUrl
+    val products by ProductEntity referrersOn ProductTable.categoryId
 
     fun toModel() = Category(
         id = id.value,
