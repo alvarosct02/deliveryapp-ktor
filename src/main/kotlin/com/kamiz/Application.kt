@@ -1,5 +1,6 @@
 package com.kamiz
 
+import com.kamiz.data.CategoryDataSource
 import com.kamiz.data.UserDataSource
 import com.kamiz.data.local.DatabaseFactory
 import com.kamiz.plugins.configureRouting
@@ -25,11 +26,12 @@ fun Application.module() {
         secret = System.getenv("JWT_SECRET")
     )
     val userDataSource = UserDataSource()
+    val categoryDataSource = CategoryDataSource()
     val tokenService = JwtTokenService()
     val hashingService = SHA256HashingService()
 
     DatabaseFactory.init()
     configureSerialization()
     configureSecurity(tokenConfig)
-    configureRouting(userDataSource, hashingService, tokenService, tokenConfig)
+    configureRouting(userDataSource, categoryDataSource, hashingService, tokenService, tokenConfig)
 }
